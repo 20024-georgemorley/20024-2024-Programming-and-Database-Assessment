@@ -3,5 +3,14 @@
 {% block pageheading %}Maori Dictionary{% endblock %}
 
 {% block main %}
+    <div class="category-menu">
+        <ul>
+            {% for category in categories %}
+            <li> <a href="/dictionary/{{ category[0] }}">{{ category[1] }}</a> </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class>
 
+    </div>
 {% endblock %}
