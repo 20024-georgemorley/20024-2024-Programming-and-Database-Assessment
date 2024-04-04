@@ -5,8 +5,6 @@
     <meta charset="utf-8">
     <title>The Maori Dictionary</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"/>
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 </head>
 
@@ -16,8 +14,9 @@
         <div class="navbar-brand">The Coffee Shop</div>
         <div class="navbar-links">
             <a href="/">Home</a>
-            <a href="/menu/1">Menu</a>
-            <a href="/contact">Contact</a>
+            {% if  %}
+            <a href="/dictionary">Menu</a>
+            <a href="/signup">Signup</a>
             <a href="/login">Login</a>
         </div>
     </div>
