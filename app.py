@@ -13,7 +13,8 @@ from flask import Flask, render_template, request, redirect
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
-DATABASE = ''
+DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
+
 
 def open_database(db_file):
     try:
@@ -22,6 +23,7 @@ def open_database(db_file):
     except Error as err:
         print(err)
         return None
+
 
 # Below is where the pages are rendered using an app.route() script and a render_template defined above.
 
@@ -34,19 +36,20 @@ def render_home_page():
 def render_dictionary_page():
     return render_template('dictionary_page.html')
 
+
 @app.route('/login')
 def render_login_page():
-
     return render_template('')
 
-@app.route('/signup', methods=['POST','GET'])
+
+@app.route('/signup', methods=['POST', 'GET'])
 def render_signup_page():
     if request.method == 'POST':
         print(request.form)
-        first_name = request.form.get('first_name').title().strip()
-        last_name = request.form.get('last_name').title().strip()
+        first_name = request.form.get('fname').title().strip()
+        last_name = request.form.get('lname').title().strip()
         email = request.form.get('email').title().strip()
-        user_type = request.form.get('type').title().strip()
+        type = request.form.get('type')
         password = request.form.get('password')
         password_two = request.form.get('password_two')
 
@@ -58,11 +61,11 @@ def render_signup_page():
 
         hashed_password = bcrypt.generate_password_hash(password)
         con = open_database(DATABASE)
-        query = "INSERT INTO user (type, first_name, last_name, email, password) VALUES (?, ?, ? ,?)"
+        query = "INSERT INTO users (type, first_name, last_name, email, password) VALUES (?, ?, ? ,?)"
         cur = con.cursor()
 
         try:
-            cur.execute(query, (user_type, first_name, last_name, email, hashed_password))
+            cur.execute(query, (type, first_name, last_name, email, hashed_password))
         except sqlite3.IntegrityError:
             con.close()
             return redirect('/signup?error=Email+is+already+in+use')
@@ -70,9 +73,9 @@ def render_signup_page():
         con.commit()
         con.close()
 
-        return redirect("/login")
+        return redirect("/")
 
-    return render_template('signup.html')
+    return render_template('signup_page.html')
 
 
 if __name__ == '__main__':

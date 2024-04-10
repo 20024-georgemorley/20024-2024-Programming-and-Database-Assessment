@@ -4,11 +4,11 @@
 {% block main %}
     <form class="myform" method="post">
         <div class="dropdown">
-            <button class="drop_button">Student or Teacher</button>
-            <div class="dropdown_content">
-                <option value="{{ users[ }}">Student</option>
-                <option value="2">Teacher</option>
-            </div>
+            <p>Please select student or teacher.</p>
+            <select class="dropdown_content">
+                <option value="1"> Student </option>
+                <option value="2"> Teacher </option>
+            </select>
         </div>
         <div class="form-group">
             <div class="form-label">First Name:</div>
