@@ -12,6 +12,7 @@ from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
+app.secret_key = "ueuywq9571"
 
 DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
 
@@ -34,22 +35,30 @@ def render_home_page():
 
 @app.route('/dictionary')
 def render_dictionary_page():
+    con = open_database(DATABASE)
+    query = 'SELECT maori_name, english_name, category, definition, level, user_id FROM dictionary'
+    cur = con.cursor()
+    cur.execute(query)
+    dictionary_content = cur.fetchall()
+    con.close()
+    print(dictionary_content)
     return render_template('dictionary_page.html')
 
 
 @app.route('/login')
 def render_login_page():
-    return render_template('')
+    return render_template('login_page.html')
 
 
 @app.route('/signup', methods=['POST', 'GET'])
 def render_signup_page():
     if request.method == 'POST':
         print(request.form)
+        print(request.form.get('type'))
         first_name = request.form.get('fname').title().strip()
         last_name = request.form.get('lname').title().strip()
         email = request.form.get('email').title().strip()
-        type = request.form.get('type')
+        type = request.form.get('user_type')
         password = request.form.get('password')
         password_two = request.form.get('password_two')
 
@@ -61,7 +70,7 @@ def render_signup_page():
 
         hashed_password = bcrypt.generate_password_hash(password)
         con = open_database(DATABASE)
-        query = "INSERT INTO users (type, first_name, last_name, email, password) VALUES (?, ?, ? ,?)"
+        query = "INSERT INTO users (type, first_name, last_name, email, password) VALUES (?, ?, ? ,? ,?)"
         cur = con.cursor()
 
         try:

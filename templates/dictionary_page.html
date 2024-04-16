@@ -1,9 +1,11 @@
 {% extends 'template_page.html' %}
 
 {% block pageheading %}Maori Dictionary{% endblock %}
-    <div class="category_menu">
 
-    </div>
 {% block main %}
-
+    <table>
+        {% for i in dictionary %}
+        <th></th>
+        {% endfor %}
+    </table>
 {% endblock %}
