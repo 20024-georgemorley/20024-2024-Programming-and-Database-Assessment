@@ -60,3 +60,25 @@ dictionary-box {
 dictionary-box-heading {
     padding: 0.5rem;
 }
+
+content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+box {
+    width: 32%;
+    border: 5px solid black;
+    color: rgba(44, 62, 80, 1.0);
+    margin-bottom: 0.5rem;
+}
+
+box_heading {
+    padding: 0.5rem;
+}
+
+box_image {
+    height: 150px;
+    overflow: hidden;
+}

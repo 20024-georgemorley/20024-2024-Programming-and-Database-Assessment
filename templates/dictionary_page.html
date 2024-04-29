@@ -3,9 +3,23 @@
 {% block pageheading %}Maori Dictionary{% endblock %}
 
 {% block main %}
-    <table>
-        {% for i in dictionary %}
-        <th></th>
+    <div class="content">
+        {% for word in dictionary %}
+        <div class="box">
+            <div class="box_heading">
+                <h3><strong>Maori - </strong> {{ word[0] }} </h3>
+                <h3><strong>English - </strong> {{ word[1] }} </h3>
+            </div>
+            <div class="box_image">
+                <img src="/static/images/{{ word[6] }}.jpg">
+            </div>
+            <div>
+                <p><strong>Category - </strong> {{ word[2] }} </p>
+                <p><strong>Definition - </strong> {{ word[3] }}</p>
+                <p><strong>Level - </strong> {{ word[4] }}</p>
+                <p><strong>User Added - </strong> {{ word[5] }}</p>
+            </div>
+        </div>
         {% endfor %}
-    </table>
+    </div>
 {% endblock %}

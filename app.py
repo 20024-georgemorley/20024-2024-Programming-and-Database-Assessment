@@ -16,6 +16,8 @@ app.secret_key = "ueuywq9571"
 
 DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
 
+# make sure to add updoot system
+
 
 def open_database(db_file):
     try:
@@ -36,13 +38,13 @@ def render_home_page():
 @app.route('/dictionary')
 def render_dictionary_page():
     con = open_database(DATABASE)
-    query = 'SELECT maori_name, english_name, category, definition, level, user_id FROM dictionary'
+    query = 'SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary'
     cur = con.cursor()
     cur.execute(query)
     dictionary_content = cur.fetchall()
     con.close()
     print(dictionary_content)
-    return render_template('dictionary_page.html')
+    return render_template('dictionary_page.html', dictionary=dictionary_content)
 
 
 @app.route('/login')
