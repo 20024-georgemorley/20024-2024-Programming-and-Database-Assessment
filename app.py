@@ -16,6 +16,7 @@ app.secret_key = "ueuywq9571"
 
 DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
 
+
 # make sure to add updoot system
 
 
@@ -45,6 +46,34 @@ def render_dictionary_page():
     con.close()
     print(dictionary_content)
     return render_template('dictionary_page.html', dictionary=dictionary_content)
+
+
+@app.route('/dictionary_admin', methods=['POST', 'GET'])
+def render_dictionary_admin():
+    if request.method == 'POST':
+        print(request.form)
+        print(request.form.get('type'))
+        english_name = request.form.get('english_name').title().strip()
+        maori_name = request.form.get('maori_name').title().strip()
+        category = request.form.get('category').title().strip()
+        definition = request.form.get('definition').title().strip()
+        level = request.form.get('level').title().strip()
+
+        if level in range(1, 11):
+            print(level)
+        else:
+            return redirect("/dictionary_admin?error=Choose+a+level+between+1+and+10")
+
+        con = open_database(DATABASE)
+        query = 'INSERT INTO dictionary (english_name, maori_name, category, definition, level) VALUES (?, ?, ? ,? ,?)'
+        cur = con.cursor()
+        cur.execute(query, (english_name, maori_name, category, definition, level))
+
+        con.commit()
+        con.close()
+
+        return redirect("/dictionary")
+    return render_template('dictionary_admin.html')
 
 
 @app.route('/login')
