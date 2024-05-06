@@ -10,27 +10,25 @@
 
 <body>
 <nav>
-    <div class="container">
-        <div class="navbar-brand">The Maori Dictionary</div>
-        <div class="navbar-links">
+    <div>
+        <div>The Maori Dictionary</div>
+        <div>
             <a href="/">Home</a>
             <a href="/signup">Signup</a>
             {% if logged_in %}
             <a href="/logout">Logout</a>
             <a href="/search">Search</a>
             <a href="/dictionary">Dictionary</a>
-                {% if admin_user %}
+                {% if is_admin %}
                 <a href="/dictionary_admin">Admin</a>
                 {% endif %}
             {% else %}
             <a href="/login">Login</a>
             {% endif %}
-
-
         </div>
     </div>
 </nav>
-<div class="container">
+<div>
     <header>
         <h1></h1>
         <h2>{% block pageheading %}{% endblock %}</h2>

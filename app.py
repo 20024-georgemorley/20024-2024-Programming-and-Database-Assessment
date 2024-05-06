@@ -14,7 +14,7 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "9571"
 
-DATABASE = 'C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database'
+DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
 
 
 # make sure to add upvote system
@@ -29,6 +29,15 @@ def open_database(db_file):
         return None
 
 
+def is_admin():
+    if session.get('type') != 'student':
+        print('Teacher user.')
+        return True
+    else:
+        print('Student user.')
+        return False
+
+
 def is_logged_in():
     if session.get('email') is None:
         print('Not logged in.')
@@ -37,12 +46,13 @@ def is_logged_in():
         print('Logged in.')
         return True
 
+
 # Below is where the pages are rendered using an app.route() script and a render_template defined above.
 
 
 @app.route('/')
 def render_home_page():
-    return render_template('home_page.html', logged_in=is_logged_in())
+    return render_template('home_page.html', logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/search')
@@ -54,7 +64,7 @@ def render_search_page():
     search_query = cur.fetchall()
     con.close()
     print(search_query)
-    return render_template('search_page.html', search=search_query, logged_in=is_logged_in())
+    return render_template('search_page.html', search=search_query, logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/dictionary')
@@ -66,7 +76,7 @@ def render_dictionary_page():
     dictionary_content = cur.fetchall()
     con.close()
     print(dictionary_content)
-    return render_template('dictionary_page.html', dictionary=dictionary_content, logged_in=is_logged_in())
+    return render_template('dictionary_page.html', dictionary=dictionary_content, logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/dictionary_admin', methods=['POST', 'GET'])
@@ -94,7 +104,7 @@ def render_dictionary_admin():
         con.close()
 
         return redirect("/dictionary")
-    return render_template('dictionary_admin.html', logged_in=is_logged_in())
+    return render_template('dictionary_admin.html', logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -112,34 +122,39 @@ def render_login_page():
         cur.execute(query, (email,))
         user_data = cur.fetchone()
         con.close()
-        print(user_data)
 
-        try:
-            user_id = user_data[0]
-            first_name = user_data[1]
-            db_password = user_data[2]
-        except IndexError:
-            return redirect("/login?error=Please+enter+a+correct+username+or+password")
+        if user_data is not None:
+            print(user_data)
 
-        if not bcrypt.check_password_hash(db_password, password):
-            return redirect(request.referrer + "?error=Email+or+password+are+invalid")
+            try:
+                user_id = user_data[0]
+                first_name = user_data[1]
+                db_password = user_data[2]
+            except IndexError:
+                return redirect("/login?error=Please+enter+a+correct+username+or+password")
 
-        session['email'] = email
-        session['first_name'] = first_name
-        session['user_id'] = user_id
+            if not bcrypt.check_password_hash(db_password, password):
+                return redirect(request.referrer + "?error=Email+or+password+are+invalid")
 
-        print(session)
-        return redirect('/')
+            session['email'] = email
+            session['first_name'] = first_name
+            session['user_id'] = user_id
 
-    return render_template('login_page.html', logged_in=is_logged_in())
+            print(session)
+            return redirect('/')
+        else:
+            return redirect("/login?error=Email+does+not+exist.")
+
+    return render_template('login_page.html', is_admin=is_admin())
 
 
 @app.route('/logout')
-def logout_page():
+def logout():
     print(list(session.keys()))
     [session.pop(key) for key in list(session.keys())]
     print(list(session.keys()))
-    return redirect('/?message=Thank+you+for+using+our+website!', logged_in=is_logged_in())
+    return redirect('/?message=Thank+you+for+using+our+website!')
+    return redirect('/')
 
 
 @app.route('/signup', methods=['POST', 'GET'])
@@ -151,8 +166,8 @@ def render_signup_page():
         print(request.form.get('type'))
         first_name = request.form.get('fname').title().strip()
         last_name = request.form.get('lname').title().strip()
-        email = request.form.get('email').title().strip()
-        user_type = request.form.get('user_type')
+        email = request.form.get('email').lower().strip()
+        type = request.form.get('type')
         password = request.form.get('password')
         password_two = request.form.get('password_two')
 
@@ -162,6 +177,8 @@ def render_signup_page():
         if len(password) < 8:
             return redirect('/signup?error=Password+must+be+at+least+eight+characters+long')
 
+        if type != 'student' or 'teacher':
+            return redirect('/signup?error=Please+select+student+or+teacher')
 
         hashed_password = bcrypt.generate_password_hash(password)
         con = open_database(DATABASE)
@@ -169,7 +186,7 @@ def render_signup_page():
         cur = con.cursor()
 
         try:
-            cur.execute(query, (user_type, first_name, last_name, email, hashed_password))
+            cur.execute(query, (type, first_name, last_name, email, hashed_password))
         except sqlite3.IntegrityError:
             con.close()
             return redirect('/signup?error=Email+is+already+in+use')
@@ -179,7 +196,7 @@ def render_signup_page():
 
         return redirect("/")
 
-    return render_template('signup_page.html', logged_in=is_logged_in())
+    return render_template('signup_page.html', logged_in=is_logged_in(), is_admin=is_admin())
 
 
 if __name__ == '__main__':
