@@ -14,7 +14,10 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "9571"
 
-DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
+# for home computer - C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database
+# for school computer - C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database
+
+DATABASE = 'C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database'
 
 
 # make sure to add upvote system
@@ -30,7 +33,7 @@ def open_database(db_file):
 
 
 def is_admin():
-    if session.get('type') != 'student':
+    if session.get('type') == '1':
         print('Teacher user.')
         return True
     else:
@@ -116,7 +119,7 @@ def render_login_page():
         email = request.form['email'].strip().lower()
         password = request.form['password'].strip()
         print(email)
-        query = "SELECT user_id, first_name, password FROM users WHERE email = ?"
+        query = "SELECT user_id, type, first_name, password FROM users WHERE email = ?"
         con = open_database(DATABASE)
         cur = con.cursor()
         cur.execute(query, (email,))
@@ -128,8 +131,9 @@ def render_login_page():
 
             try:
                 user_id = user_data[0]
-                first_name = user_data[1]
-                db_password = user_data[2]
+                type = user_data[1]
+                first_name = user_data[2]
+                db_password = user_data[3]
             except IndexError:
                 return redirect("/login?error=Please+enter+a+correct+username+or+password")
 
@@ -139,6 +143,7 @@ def render_login_page():
             session['email'] = email
             session['first_name'] = first_name
             session['user_id'] = user_id
+            session['type'] = type
 
             print(session)
             return redirect('/')
@@ -170,15 +175,13 @@ def render_signup_page():
         type = request.form.get('type')
         password = request.form.get('password')
         password_two = request.form.get('password_two')
+        print(type)
 
         if password != password_two:
             return redirect('/signup?error=Passwords+do+not+match+try+again')
 
         if len(password) < 8:
             return redirect('/signup?error=Password+must+be+at+least+eight+characters+long')
-
-        if type != 'student' or 'teacher':
-            return redirect('/signup?error=Please+select+student+or+teacher')
 
         hashed_password = bcrypt.generate_password_hash(password)
         con = open_database(DATABASE)
