@@ -60,11 +60,23 @@ def render_home_page():
 
 @app.route('/search', methods=['POST', 'GET'])
 def render_search_page():
+    print('hello 1')
     if request.method == 'POST':
+        print('hello 2')
+        print(request.form)
         search = request.form.get('search')
         print(search)
 
-    return render_template('search_page.html', logged_in=is_logged_in(), is_admin=is_admin())
+        # add inner join at some point
+
+        query = "SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary WHERE maori_name LIKE ? OR english_name LIKE ?"
+        con = open_database(DATABASE)
+        cur = con.cursor()
+        cur.execute(query, ('%'+search+'%', '%'+search+'%', ))
+        search_content = cur.fetchall()
+        con.close()
+        print(search_content)
+    return render_template('search_page.html', logged_in=is_logged_in(), is_admin=is_admin(), search=search_content())
 
 
 @app.route('/dictionary')
