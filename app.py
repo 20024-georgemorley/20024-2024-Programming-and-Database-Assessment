@@ -58,16 +58,13 @@ def render_home_page():
     return render_template('home_page.html', logged_in=is_logged_in(), is_admin=is_admin())
 
 
-@app.route('/search')
+@app.route('/search', methods=['POST', 'GET'])
 def render_search_page():
-    con = open_database(DATABASE)
-    query = 'SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary WHERE maori_name LIKE "% + search + %" OR english_name LIKE "% + search + %"'
-    cur = con.cursor()
-    cur.execute(query)
-    search_query = cur.fetchall()
-    con.close()
-    print(search_query)
-    return render_template('search_page.html', search=search_query, logged_in=is_logged_in(), is_admin=is_admin())
+    if request.method == 'POST':
+        search = request.form.get('search')
+        print(search)
+
+    return render_template('search_page.html', logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/dictionary')

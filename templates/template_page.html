@@ -14,7 +14,6 @@
         <div>The Maori Dictionary</div>
         <div>
             <a href="/">Home</a>
-            <a href="/signup">Signup</a>
             {% if logged_in %}
             <a href="/logout">Logout</a>
             <a href="/search">Search</a>
@@ -23,6 +22,7 @@
                 <a href="/dictionary_admin">Admin</a>
                 {% endif %}
             {% else %}
+            <a href="/signup">Signup</a>
             <a href="/login">Login</a>
             {% endif %}
         </div>
