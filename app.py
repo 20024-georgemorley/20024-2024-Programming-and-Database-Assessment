@@ -73,10 +73,12 @@ def render_search_page():
         con = open_database(DATABASE)
         cur = con.cursor()
         cur.execute(query, ('%'+search+'%', '%'+search+'%', ))
-        search_content = cur.fetchall()
+        search = cur.fetchall()
         con.close()
-        print(search_content)
-    return render_template('search_page.html', logged_in=is_logged_in(), is_admin=is_admin(), search=search_content())
+        print(search)
+
+        session['search'] = search
+    return render_template('search_page.html', logged_in=is_logged_in(), is_admin=is_admin(), )
 
 
 @app.route('/dictionary')
@@ -117,6 +119,28 @@ def render_dictionary_admin():
 
         return redirect("/dictionary")
     return render_template('dictionary_admin.html', logged_in=is_logged_in(), is_admin=is_admin())
+
+
+@app.route('/category', methods=['POST', 'GET'])
+def render_category_page():
+    con = open_database(DATABASE)
+    query_category = 'SELECT DISTINCT category FROM dictionary'
+    cur = con.cursor()
+    cur.execute(query_category)
+    category = cur.fetchall()
+    print(category)
+    con.close()
+    if request.method == 'POST':
+        print(request.form)
+        category_chosen = request.form.get('category').lower().strip()
+        con = open_database(DATABASE)
+        query = 'SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary'
+        cur = con.cursor()
+        cur.execute(query)
+        dictionary_content_category = cur.fetchall()
+
+
+    return render_template('category_page.html', category_count=count, category=category, dictionary_category=dictionary_content_category, logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/login', methods=['POST', 'GET'])

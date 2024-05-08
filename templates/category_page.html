@@ -1,21 +1,24 @@
 {% extends 'template_page.html' %}
 
-{% block pageheading %}Search Dictionary{% endblock %}
+{% block pageheading %}Maori Dictionary - Filter by Category{% endblock %}
 
 {% block main %}
     <form class="myform" method="post">
-        <div class="form-group">
-            <div class="form-label">Search:</div>
-            <div class="form-element"><input type="text" name="search" id="search" required></div>
-        </div>
-        <div class="form-group">
-            <div class="form-label"></div>
-            <div class="form-element"><input type="submit" value="Submit Search"></div>
-        </div>
+        <label for="user_type">Choose a category to filter by:</label>
+            <select class="form-control" name="type" id="type" required>
+                {% for i in category %}
+                <option value='category'>{{ i[0] }}</option>
+                {% endfor %}
+            </select>
+
+            <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-element"><input type="submit" value="Submit Filter"</div>
+            </div>
     </form>
 
     <div class="content">
-        {% for word in search %}
+        {% for word in dictionary_category %}
         <div class="box">
             <table class="box">
                 <div class="box_heading">
