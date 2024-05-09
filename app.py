@@ -17,7 +17,7 @@ app.secret_key = "9571"
 # for home computer - C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database
 # for school computer - C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database
 
-DATABASE = 'C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database'
+DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
 
 
 # make sure to add upvote system
@@ -134,13 +134,13 @@ def render_category_page():
         print(request.form)
         category_chosen = request.form.get('category').lower().strip()
         con = open_database(DATABASE)
-        query = 'SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary'
+        query = 'SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary WHERE category LIKE ?'
         cur = con.cursor()
-        cur.execute(query)
+        cur.execute(query, (category_chosen, ))
         dictionary_content_category = cur.fetchall()
 
 
-    return render_template('category_page.html', category_count=count, category=category, dictionary_category=dictionary_content_category, logged_in=is_logged_in(), is_admin=is_admin())
+    return render_template('category_page.html', category=category, logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/login', methods=['POST', 'GET'])
