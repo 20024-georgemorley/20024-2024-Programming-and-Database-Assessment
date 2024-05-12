@@ -72,7 +72,7 @@ def render_search_page():
         query = "SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary WHERE maori_name LIKE ? OR english_name LIKE ?"
         con = open_database(DATABASE)
         cur = con.cursor()
-        cur.execute(query, ('%'+search+'%', '%'+search+'%', ))
+        cur.execute(query, ('%' + search + '%', '%' + search + '%',))
         search = cur.fetchall()
         con.close()
         print(search)
@@ -131,16 +131,18 @@ def render_category_page():
     print(category)
     con.close()
     if request.method == 'POST':
-        print(request.form)
-        category_chosen = request.form.get('category').lower().strip()
+        print('hello 2')
+        print(request.form.get('category'))
+        category_chosen = request.form.get('category').lower().title().strip()
+        print(category_chosen)
         con = open_database(DATABASE)
-        query = 'SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary'
+        query = 'SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary WHERE category LIKE ?'
         cur = con.cursor()
-        cur.execute(query)
+        cur.execute(query, (category_chosen,))
         dictionary_content_category = cur.fetchall()
+        print(dictionary_content_category)
 
-
-    return render_template('category_page.html', category_count=count, category=category, dictionary_category=dictionary_content_category, logged_in=is_logged_in(), is_admin=is_admin())
+    return render_template('category_page.html', category=category, logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/login', methods=['POST', 'GET'])

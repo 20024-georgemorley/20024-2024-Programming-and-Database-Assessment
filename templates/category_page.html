@@ -5,15 +5,15 @@
 {% block main %}
     <form class="myform" method="post">
         <label for="user_type">Choose a category to filter by:</label>
-            <select class="form-control" name="type" id="type" required>
-                {% for i in category %}
-                <option value='category'>{{ i[0] }}</option>
+            <select class="form-control" name="category" id="category" required>
+                {% for id in category %}
+                <option value={{ id[0] }}>{{ id[0] }}</option>
                 {% endfor %}
             </select>
 
             <div class="form-group">
                 <div class="form-label"></div>
-                <div class="form-element"><input type="submit" value="Submit Filter"</div>
+                <div class="form-element"><input type="submit" value="Submit Filter"></div>
             </div>
     </form>
 
