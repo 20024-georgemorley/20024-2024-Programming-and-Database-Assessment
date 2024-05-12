@@ -1,0 +1,20 @@
+* {
+    font-family: Arial;
+    background: lightgrey
+}
+
+title-bar {
+    background: darkgrey;
+    color: black;
+    border: 5px solid black;
+}
+
+box {
+    border: 5px solid black;
+    color: aqua;
+}
+
+box_image {
+    height: 150px;
+    overflow: hidden;
+}

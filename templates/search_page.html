@@ -1,4 +1,4 @@
-{% extends 'template_page.html' %}
+{% extends 'base.html' %}
 
 {% block pageheading %}Search Dictionary{% endblock %}
 
@@ -15,7 +15,7 @@
     </form>
 
     <div class="content">
-        {% for word in search %}
+        {% for word in search_content %}
         <div class="box">
             <table class="box">
                 <div class="box_heading">

@@ -76,9 +76,10 @@ def render_search_page():
         search = cur.fetchall()
         con.close()
         print(search)
+        return render_template('search_page.html', search_content=search, logged_in=is_logged_in(), is_admin=is_admin())
 
-        session['search'] = search
-    return render_template('search_page.html', logged_in=is_logged_in(), is_admin=is_admin(), )
+
+    return render_template('search_page.html', logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/dictionary')
@@ -90,6 +91,10 @@ def render_dictionary_page():
     dictionary_content = cur.fetchall()
     con.close()
     print(dictionary_content)
+    if session.get('open_word'):
+        open_word = True
+        print(open_word)
+        return render_template('dictionary_page.html', open_word=open_word, dictionary=dictionary_content, logged_in=is_logged_in(), is_admin=is_admin())
     return render_template('dictionary_page.html', dictionary=dictionary_content, logged_in=is_logged_in(), is_admin=is_admin())
 
 
@@ -138,8 +143,7 @@ def render_category_page():
         cur = con.cursor()
         cur.execute(query, (category_chosen, ))
         dictionary_content_category = cur.fetchall()
-        print(dictionary_content_category)
-
+        return render_template('category_page.html', dictionary_category=dictionary_content_category, category=category, logged_in=is_logged_in(), is_admin=is_admin())
 
     return render_template('category_page.html', category=category, logged_in=is_logged_in(), is_admin=is_admin())
 
