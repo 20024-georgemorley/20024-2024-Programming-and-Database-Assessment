@@ -17,7 +17,7 @@ app.secret_key = "9571"
 # for home computer - C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database
 # for school computer - C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database
 
-DATABASE = 'C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database'
+DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
 
 
 # make sure to add upvote system
@@ -135,7 +135,7 @@ def render_dictionary_page():
     # This select statement only needs to display the word's name in maori, as that is what is present on the link that
     # the user will click on to view the rest of the information about the word in the /word page.
     con = open_database(DATABASE)
-    query = 'SELECT maori_name FROM dictionary'
+    query = 'SELECT maori_name, english_name, category, definition, level FROM dictionary'
     cur = con.cursor()
     cur.execute(query)
     dictionary_content = cur.fetchall()

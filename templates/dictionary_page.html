@@ -7,9 +7,24 @@
     <div class="box">
         {% for word in dictionary %}
             <table>
-                <div class="box-word">
-                    <a href="/word/{{ word[0] }}">{{ word[0] }}</a>
-                </div>
+                <thead>
+                    <tr class="box-word">
+                        <th>Maori Name</th>
+                        <th>English Name</th>
+                        <th>Category</th>
+                        <th>Definition</th>
+                        <th>Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="box-word">
+                        <td><a href="/word/{{ word[0] }}">{{ word[0] }}</a></td>
+                        <td>{{ word[1] }}</td>
+                        <td>{{ word[2] }}</td>
+                        <td>{{ word[3] }}</td>
+                        <td>{{ word[4] }}</td>
+                    </tr>
+                </tbody>
             </table>
         {% endfor %}
     <a href="/animegirls">mihi</a>

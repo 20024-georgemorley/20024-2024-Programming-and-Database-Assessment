@@ -17,12 +17,20 @@ title-bar {
 
 .box-word {
     border: solid black;
-    width: fit-content;
     border-width: 1px;
     color: black;
+    word-wrap: normal;
 }
 
 box_image {
     height: 150px;
     overflow: hidden;
+}
+
+tr, td, th {
+    justify-content: normal;
+    margin: auto;
+    width: 100%;
+    border: 1px solid black;
+    padding: 0.5rem;
 }
