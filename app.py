@@ -17,7 +17,7 @@ app.secret_key = "9571"
 # for home computer - C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database
 # for school computer - C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database
 
-DATABASE = 'C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database'
+DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
 
 
 # make sure to add upvote system
@@ -60,9 +60,7 @@ def render_home_page():
 
 @app.route('/search', methods=['POST', 'GET'])
 def render_search_page():
-    print('hello 1')
     if request.method == 'POST':
-        print('hello 2')
         print(request.form)
         search = request.form.get('search')
         print(search)
@@ -82,19 +80,27 @@ def render_search_page():
     return render_template('search_page.html', logged_in=is_logged_in(), is_admin=is_admin())
 
 
-@app.route('/dictionary')
+@app.route('/word/<word>')
+def render_word_page(word):
+    con = open_database(DATABASE)
+    query = 'SELECT * FROM dictionary WHERE maori_name LIKE ?'
+    cur = con.cursor()
+    cur.execute(query, (word, ))
+    word_info = cur.fetchall()
+    con.close()
+    print(word_info)
+    return render_template('word_page.html', word=word_info, is_admin=is_admin())
+
+
+@app.route('/dictionary', methods=['POST', 'GET'])
 def render_dictionary_page():
     con = open_database(DATABASE)
-    query = 'SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary'
+    query = 'SELECT user_id, maori_name, word_image FROM dictionary'
     cur = con.cursor()
     cur.execute(query)
     dictionary_content = cur.fetchall()
     con.close()
     print(dictionary_content)
-    if session.get('open_word'):
-        open_word = True
-        print(open_word)
-        return render_template('dictionary_page.html', open_word=open_word, dictionary=dictionary_content, logged_in=is_logged_in(), is_admin=is_admin())
     return render_template('dictionary_page.html', dictionary=dictionary_content, logged_in=is_logged_in(), is_admin=is_admin())
 
 

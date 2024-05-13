@@ -8,8 +8,7 @@
         {% for word in dictionary %}
             <table>
                 <div class="box">
-                    <h3> Maori - {{ word[0] }}</h3>
-                    <h3> English - {{ word[1] }}</h3>
+                    <a href="/word/{{ word[1] }}">{{ word[1] }}</a>
                 </div>
             </table>
         {% endfor %}
