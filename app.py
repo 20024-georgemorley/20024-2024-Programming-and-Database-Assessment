@@ -17,22 +17,29 @@ app.secret_key = "9571"
 # for home computer - C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database
 # for school computer - C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database
 
-DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
+DATABASE = 'C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database'
 
 
 # make sure to add upvote system
 
 
 def open_database(db_file):
+    # This function is responsible for connecting to the external database that is found in the constant 'DATABASE' shown above.
     try:
         connection = sqlite3.connect(db_file)
         return connection
+        # This above part of the function is responsible for the connection, and if the connection is unsuccessful,
+        # the function will return the below error and will not return a connection.
     except Error as err:
         print(err)
         return None
 
 
 def is_admin():
+    # This script is responsible for determining if the user is an admin or not, and it does this by requesting
+    # the state of the 'type' field for whatever user is currently in-session. It is a binary value, where 1 is
+    # equal to 'teacher', and 0 is equal to 'student'. Having these as binary values as integers saves space and
+    # reduces computing load.
     if session.get('type') == '1':
         print('Teacher user.')
         return True
@@ -42,6 +49,9 @@ def is_admin():
 
 
 def is_logged_in():
+    # Similar purpose to the is_admin() function above, but in this case it requests whether the current session's
+    # user has an email or not, and as the email is a mandatory field, it means that if email is equal to 'None', it
+    # means that the user is not logged in.
     if session.get('email') is None:
         print('Not logged in.')
         return False
@@ -55,7 +65,7 @@ def is_logged_in():
 
 @app.route('/')
 def render_home_page():
-    return render_template('home_page.html', logged_in=is_logged_in(), is_admin=is_admin())
+    return render_template('home_page.html')
 
 
 @app.route('/search', methods=['POST', 'GET'])
@@ -67,21 +77,49 @@ def render_search_page():
 
         # add inner join at some point
 
-        query = "SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary WHERE maori_name LIKE ? OR english_name LIKE ?"
+        # **THIS COMMENT WILL EXPLAIN ALL DATABASE OPENING, REQUESTING AND CLOSING SCRIPTS WITH MINOR CHANGES**
+        # This specific select statement selects all the data from the 'dictionary' table where the word's maori
+        # name or english name contains the word or letter written in the search field present in the search page.
+        # This is done by specifying within the query execution statement exactly what these words should be compared
+        # against.
+        query = "SELECT * FROM dictionary WHERE maori_name LIKE ? OR english_name LIKE ?"
         con = open_database(DATABASE)
         cur = con.cursor()
         cur.execute(query, ('%'+search+'%', '%'+search+'%', ))
         search = cur.fetchall()
         con.close()
         print(search)
+
+        # This below section serves to re-render the page with the new information present.
         return render_template('search_page.html', search_content=search, logged_in=is_logged_in(), is_admin=is_admin())
 
-
+    # This is the original render of the page with no searched information present.
     return render_template('search_page.html', logged_in=is_logged_in(), is_admin=is_admin())
+
+
+@app.route('/delete/<word>')
+def render_delete_word_page(word):
+
+    # This select statement selects a word from the dictionary that is equal to the word defined above that was
+    # selected by the user via a link in the dictionary page. This select statement then posts the information of
+    # that word to the page, and presents specifically the data for that word alone.
+    if request.method == 'POST':
+        con = open_database(DATABASE)
+        query = 'DELETE * FROM dictionary WHERE maori_name LIKE ?'
+        cur = con.cursor()
+        cur.execute(query, (word, ))
+        word_info = cur.fetchall()
+        con.close()
+        print(word_info)
+    return render_template('delete_word.html', word=word_info, is_admin=is_admin())
 
 
 @app.route('/word/<word>')
 def render_word_page(word):
+
+    # This select statement selects a word from the dictionary that is equal to the word defined above that was
+    # selected by the user via a link in the dictionary page. This select statement then posts the information of
+    # that word to the page, and presents specifically the data for that word alone.
     con = open_database(DATABASE)
     query = 'SELECT * FROM dictionary WHERE maori_name LIKE ?'
     cur = con.cursor()
@@ -94,8 +132,10 @@ def render_word_page(word):
 
 @app.route('/dictionary', methods=['POST', 'GET'])
 def render_dictionary_page():
+    # This select statement only needs to display the word's name in maori, as that is what is present on the link that
+    # the user will click on to view the rest of the information about the word in the /word page.
     con = open_database(DATABASE)
-    query = 'SELECT user_id, maori_name, word_image FROM dictionary'
+    query = 'SELECT maori_name FROM dictionary'
     cur = con.cursor()
     cur.execute(query)
     dictionary_content = cur.fetchall()
