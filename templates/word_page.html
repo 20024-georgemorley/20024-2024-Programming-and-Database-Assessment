@@ -5,6 +5,7 @@
 {% block main %}
     {% for id in word %}
     <div class="box">
+        <img src="/static/images/{{ id[2] }}.jpg" alt="{{ id[2] }}">
         <h3>Maori - {{ id[1] }}</h3>
         <h3>English - {{ id[2] }}</h3>
         <h3>Category (Subject) - {{ id[3] }}</h3>
