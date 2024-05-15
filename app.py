@@ -146,15 +146,25 @@ def render_dictionary_page():
 
 @app.route('/dictionary_admin', methods=['POST', 'GET'])
 def render_dictionary_admin():
+    con = open_database(DATABASE)
+    query_category = 'SELECT DISTINCT category FROM dictionary'
+    cur = con.cursor()
+    cur.execute(query_category)
+    category = cur.fetchall()
+    print(f'category = {category}')
+    con.close()
     if request.method == 'POST':
-        print(request.form)
-        print(request.form.get('type'))
+        print(f'request.form = {request.form}')
+        print(f"request.form.get('type') = {request.form.get('type')}")
         english_name = request.form.get('english_name').title().strip()
         maori_name = request.form.get('maori_name').title().strip()
         category = request.form.get('category').title().strip()
         definition = request.form.get('definition').title().strip()
-        level = request.form.get('level').title().strip()
-
+        level = request.form.get('level')
+        try:
+            level = int(level)
+        except IndexError:
+            return redirect('/dictionary_admin?error=Please+enter+a+numeral+between+1+and+10')
         if level in range(1, 11):
             print(level)
         else:
@@ -169,7 +179,7 @@ def render_dictionary_admin():
         con.close()
 
         return redirect("/dictionary")
-    return render_template('dictionary_admin.html', logged_in=is_logged_in(), is_admin=is_admin())
+    return render_template('dictionary_admin.html', category=category,  logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/category', methods=['POST', 'GET'])

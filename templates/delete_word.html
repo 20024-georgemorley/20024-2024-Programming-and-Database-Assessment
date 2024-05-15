@@ -3,13 +3,15 @@
 {% block pageheading %}Delete Word?{% endblock %}
 
 {% block main %}
-    <div class="box">
-        <h3>Are you sure that you want to delete this word?</h3>
-        <h3>This change is <strong>NOT</strong> reversible.</h3>
-    </div>
-    <a href="/dictionary"><h3>No.</h3></a>
-    <div class="form-group">
-        <div class="form-label"></div>
-        <div class="form-element"><input type="submit" value="Yes"></div>
-    </div>
+    <form class="myform" type="post">
+        <div class="box">
+            <h3>Are you sure that you want to delete this word?</h3>
+            <h3>This change is <strong>NOT</strong> reversible.</h3>
+        </div>
+        <a href="/dictionary"><h3>No.</h3></a>
+        <div class="form-group">
+            <div class="form-label"></div>
+            <div class="form-element"><input type="submit" value="Yes"></div>
+        </div>
+    </form>
 {% endblock %}

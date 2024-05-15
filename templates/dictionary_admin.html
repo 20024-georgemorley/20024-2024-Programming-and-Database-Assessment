@@ -3,10 +3,9 @@
 {% block pageheading %}Dictionary Admin Console{% endblock %}
 
 {% block main %}
-    <div class="myform" method="post">
+    <form class="myform" method="post">
         <div class="form-label">English Name:</div>
         <div class="form-element"><input type="text" name="english_name" id="english_name" required></div>
-        </div>
         <div class="error">{{ english_name_error }}</div>
 
         <div class="form-label">Maori Name:</div>
@@ -14,10 +13,12 @@
         </div>
         <div class="error">{{ maori_name_error }}</div>
 
-        <div class="form-label">Category:</div>
-        <div class="form-element"><input type="text" name="category" id="category" required></div>
-        </div>
-        <div class="error">{{ category_error }}</div>
+        <label for="user_type">Category:</label>
+        <select class="form-control" name="category" id="category" required>
+            {% for id in category %}
+            <option value={{ id[0] }}>{{ id[0] }}</option>
+            {% endfor %}
+        </select>
 
         <div class="form-label">Definition:</div>
         <div class="form-element"><input type="text" name="definition" id="definition" required></div>
@@ -27,11 +28,6 @@
         <div class="form-element"><input type="text" name="level" id="level" required></div>
         </div>
         <div class="error">{{ level_error }}</div>
-
-        <div class="form-group">
-            <div class="form-label">Word Image:</div>
-            <div class="form-element"><input type="file" id="Choose file:" required></div>
-        </div>
 
         <div class="form-group">
             <div class="form-label"></div>
