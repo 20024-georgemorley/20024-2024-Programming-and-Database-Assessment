@@ -99,7 +99,6 @@ def render_search_page():
 
 @app.route('/delete/<word>')
 def render_delete_word_page(word):
-
     # This select statement selects a word from the dictionary that is equal to the word defined above that was
     # selected by the user via a link in the dictionary page. This select statement then posts the information of
     # that word to the page, and presents specifically the data for that word alone.
@@ -111,12 +110,13 @@ def render_delete_word_page(word):
         word_info = cur.fetchall()
         con.close()
         print(word_info)
-    return render_template('delete_word.html', word=word_info, is_admin=is_admin())
+        return render_template('delete_word.html', word=word_info, admin=is_admin())
+
+    return render_template('delete_word.html', admin=is_admin())
 
 
 @app.route('/word/<word>')
 def render_word_page(word):
-
     # This select statement selects a word from the dictionary that is equal to the word defined above that was
     # selected by the user via a link in the dictionary page. This select statement then posts the information of
     # that word to the page, and presents specifically the data for that word alone.
@@ -135,7 +135,7 @@ def render_dictionary_page():
     # This select statement only needs to display the word's name in maori, as that is what is present on the link that
     # the user will click on to view the rest of the information about the word in the /word page.
     con = open_database(DATABASE)
-    query = 'SELECT maori_name, english_name, category, definition, level FROM dictionary'
+    query = 'SELECT maori_name, english_name, category_name, definition, level FROM dictionary INNER JOIN categories WHERE dictionary.category = categories.category_id'
     cur = con.cursor()
     cur.execute(query)
     dictionary_content = cur.fetchall()
@@ -147,7 +147,7 @@ def render_dictionary_page():
 @app.route('/dictionary_admin', methods=['POST', 'GET'])
 def render_dictionary_admin():
     con = open_database(DATABASE)
-    query_category = 'SELECT DISTINCT category FROM dictionary'
+    query_category = 'SELECT DISTINCT category_name FROM categories'
     cur = con.cursor()
     cur.execute(query_category)
     category = cur.fetchall()
