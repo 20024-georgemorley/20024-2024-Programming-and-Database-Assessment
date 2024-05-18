@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block pageheading %}User Info{% endblock %}
+
+{% block main %}
+    {% for id in user %}
+    <div class="box">
+        <h3>User Name - {{ id[2] }} {{ id[3] }}</h3>
+        <h3>User Type - {{ id[1] }}</h3>
+        <h3>User Number - {{ id[0] }}</h3>
+        {% if is_admin %}
+            <h3>Email - {{ id[4] }}</h3>
+        {% endif %}
+    </div>
+    {% endfor %}
+    <a href="/user_catalogue"><h3>Return to user catalogue?</h3></a>
+{% endblock %}

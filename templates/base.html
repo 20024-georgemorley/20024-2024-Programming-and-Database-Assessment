@@ -11,7 +11,7 @@
 <body>
 <nav class="title-bar">
     <div>
-        <div class="box">The Maori Dictionary</div>
+        <div class="box"><h3>The Maori Dictionary</h3></div>
         <div>
             <a href="/">Home</a>
             {% if logged_in %}
@@ -21,6 +21,7 @@
             <a href="/category">Categories</a>
                 {% if is_admin %}
                 <a href="/dictionary_admin">Admin</a>
+                <a href="/user_catalogue">Users</a>
                 {% endif %}
             {% else %}
             <a href="/signup">Signup</a>

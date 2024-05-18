@@ -1,6 +1,8 @@
 import sqlite3
 from sqlite3 import Error
 
+from time import gmtime, strftime
+
 from flask_bcrypt import Bcrypt
 from flask import Flask, render_template, request, redirect, session
 
@@ -85,7 +87,7 @@ def render_search_page():
         query = "SELECT * FROM dictionary WHERE maori_name LIKE ? OR english_name LIKE ?"
         con = open_database(DATABASE)
         cur = con.cursor()
-        cur.execute(query, ('%'+search+'%', '%'+search+'%', ))
+        cur.execute(query, ('%' + search + '%', '%' + search + '%',))
         search = cur.fetchall()
         con.close()
         print(search)
@@ -97,22 +99,23 @@ def render_search_page():
     return render_template('search_page.html', logged_in=is_logged_in(), is_admin=is_admin())
 
 
-@app.route('/delete/<word>')
+@app.route('/delete/<word>', methods=['POST', 'GET'])
 def render_delete_word_page(word):
     # This select statement selects a word from the dictionary that is equal to the word defined above that was
     # selected by the user via a link in the dictionary page. This select statement then posts the information of
     # that word to the page, and presents specifically the data for that word alone.
     if request.method == 'POST':
         con = open_database(DATABASE)
-        query = 'DELETE * FROM dictionary WHERE maori_name LIKE ?'
+        query = 'DELETE FROM dictionary WHERE maori_name LIKE ?'
         cur = con.cursor()
-        cur.execute(query, (word, ))
+        print(word)
+        cur.execute(query, (word,))
         word_info = cur.fetchall()
         con.close()
         print(word_info)
-        return render_template('delete_word.html', word=word_info, admin=is_admin())
+        return render_template('delete_word.html', word=word_info, admin=is_admin(), logged_in=is_logged_in())
 
-    return render_template('delete_word.html', admin=is_admin())
+    return render_template('delete_word.html', admin=is_admin(), logged_in=is_logged_in())
 
 
 @app.route('/word/<word>')
@@ -123,11 +126,27 @@ def render_word_page(word):
     con = open_database(DATABASE)
     query = 'SELECT * FROM dictionary WHERE maori_name LIKE ?'
     cur = con.cursor()
-    cur.execute(query, (word, ))
+    print(word)
+    cur.execute(query, (word,))
     word_info = cur.fetchall()
     con.close()
     print(word_info)
-    return render_template('word_page.html', word=word_info, is_admin=is_admin())
+    return render_template('word_page.html', word=word_info, is_admin=is_admin(), logged_in=is_logged_in())
+
+
+@app.route('/user/<user>')
+def render_user_page(user):
+    # This select statement selects a word from the dictionary that is equal to the word defined above that was
+    # selected by the user via a link in the dictionary page. This select statement then posts the information of
+    # that word to the page, and presents specifically the data for that word alone.
+    con = open_database(DATABASE)
+    query = 'SELECT user_id, type, first_name, last_name, email FROM users WHERE user_id LIKE ?'
+    cur = con.cursor()
+    cur.execute(query, (user,))
+    user_info = cur.fetchall()
+    con.close()
+    print(user_info)
+    return render_template('user_page.html', user=user_info, is_admin=is_admin(), logged_in=is_logged_in())
 
 
 @app.route('/dictionary', methods=['POST', 'GET'])
@@ -136,18 +155,34 @@ def render_dictionary_page():
     # the user will click on to view the rest of the information about the word in the /word page.
     con = open_database(DATABASE)
     query = 'SELECT maori_name, english_name, category_name, definition, level FROM dictionary INNER JOIN categories WHERE dictionary.category = categories.category_id'
+
     cur = con.cursor()
     cur.execute(query)
     dictionary_content = cur.fetchall()
     con.close()
+    print(dictionary_content[1])
     print(dictionary_content)
     return render_template('dictionary_page.html', dictionary=dictionary_content, logged_in=is_logged_in(), is_admin=is_admin())
+
+
+@app.route('/user_catalogue', methods=['POST', 'GET'])
+def render_user_catalogue():
+    # This select statement only needs to display the word's name in maori, as that is what is present on the link that
+    # the user will click on to view the rest of the information about the word in the /word page.
+    con = open_database(DATABASE)
+    query = 'SELECT user_id, first_name, last_name FROM users'
+    cur = con.cursor()
+    cur.execute(query)
+    user_content = cur.fetchall()
+    con.close()
+    print(user_content)
+    return render_template('user_catalogue.html', users=user_content, logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/dictionary_admin', methods=['POST', 'GET'])
 def render_dictionary_admin():
     con = open_database(DATABASE)
-    query_category = 'SELECT DISTINCT category_name FROM categories'
+    query_category = 'SELECT DISTINCT category_id, category_name FROM categories'
     cur = con.cursor()
     cur.execute(query_category)
     category = cur.fetchall()
@@ -159,33 +194,68 @@ def render_dictionary_admin():
         english_name = request.form.get('english_name').title().strip()
         maori_name = request.form.get('maori_name').title().strip()
         category = request.form.get('category').title().strip()
-        definition = request.form.get('definition').title().strip()
+        definition = request.form.get('definition').capitalize().strip()
         level = request.form.get('level')
+        time_added = strftime('%Y-%m-%d %H:%M:%S', gmtime())
+        print(time_added)
         try:
             level = int(level)
-        except IndexError:
+        except ValueError:
             return redirect('/dictionary_admin?error=Please+enter+a+numeral+between+1+and+10')
         if level in range(1, 11):
             print(level)
         else:
             return redirect("/dictionary_admin?error=Choose+a+level+between+1+and+10")
-
         con = open_database(DATABASE)
-        query = 'INSERT INTO dictionary (english_name, maori_name, category, definition, level) VALUES (?, ?, ? ,? ,?)'
+        user_id = session.get('user_id')
+        query = 'INSERT INTO dictionary (english_name, maori_name, category, definition, level, user_id, date_entered) VALUES (?, ?, ? ,? ,? ,? ,?)'
         cur = con.cursor()
-        cur.execute(query, (english_name, maori_name, category, definition, level))
+        cur.execute(query, (english_name, maori_name, category, definition, level, user_id, time_added))
 
         con.commit()
         con.close()
 
-        return redirect("/dictionary")
-    return render_template('dictionary_admin.html', category=category,  logged_in=is_logged_in(), is_admin=is_admin())
+        return redirect("/dictionary_admin?error=Addition+successful")
+
+    return render_template('dictionary_admin.html', category=category, logged_in=is_logged_in(), is_admin=is_admin())
+
+
+@app.route('/category_admin', methods=['POST', 'GET'])
+def render_category_admin():
+    con = open_database(DATABASE)
+    query_category = 'SELECT category_name FROM categories'
+    cur = con.cursor()
+    cur.execute(query_category)
+    category = cur.fetchall()
+    print(f'category = {category}')
+    con.close()
+    if request.method == 'POST':
+        print(f'request.form = {request.form}')
+        new_category_name = request.form.get('category_name').title().strip()
+        try:
+            new_category_name = str(new_category_name)
+        except IndexError:
+            return redirect('/dictionary_admin?error=Please+enter+a+category+word')
+        con = open_database(DATABASE)
+        user_id = session.get('user_id')
+        time_added = strftime('%Y-%m-%d %H:%M:%S', gmtime())
+        print(time_added)
+        query = 'INSERT INTO categories (category_name, user_id, date_entered) VALUES (?, ?, ?)'
+        cur = con.cursor()
+        cur.execute(query, (new_category_name, user_id, time_added))
+
+        con.commit()
+        con.close()
+
+        return redirect("/dictionary_admin?error=Addition+successful")
+
+    return render_template('category_admin.html', category=category, logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/category', methods=['POST', 'GET'])
 def render_category_page():
     con = open_database(DATABASE)
-    query_category = 'SELECT DISTINCT category FROM dictionary'
+    query_category = 'SELECT DISTINCT category_name FROM categories'
     cur = con.cursor()
     cur.execute(query_category)
     category = cur.fetchall()
@@ -195,9 +265,9 @@ def render_category_page():
         print(request.form)
         category_chosen = request.form.get('category').lower().title().strip()
         con = open_database(DATABASE)
-        query = 'SELECT maori_name, english_name, category, definition, level, user_id, word_image FROM dictionary WHERE category LIKE ?'
+        query = 'SELECT maori_name, english_name, category_name, definition, level FROM dictionary INNER JOIN categories WHERE categories.category_name = ?'
         cur = con.cursor()
-        cur.execute(query, (category_chosen, ))
+        cur.execute(query, (category_chosen,))
         dictionary_content_category = cur.fetchall()
         return render_template('category_page.html', dictionary_category=dictionary_content_category, category=category, logged_in=is_logged_in(), is_admin=is_admin())
 
@@ -253,7 +323,6 @@ def logout():
     [session.pop(key) for key in list(session.keys())]
     print(list(session.keys()))
     return redirect('/?message=Thank+you+for+using+our+website!')
-    return redirect('/')
 
 
 @app.route('/signup', methods=['POST', 'GET'])

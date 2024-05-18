@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block pageheading %}Dictionary Admin Console{% endblock %}
+
+{% block main %}
+    <div class="box">
+        <h3>Add a category:</h3>
+        <form class="myform" method="post">
+            <div class="form-label">Category Name:</div>
+            <div class="form-element"><input type="text" name="category_name" id="category_name" required></div>
+
+            <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-element"><input type="submit" value="Submit Category"></div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
