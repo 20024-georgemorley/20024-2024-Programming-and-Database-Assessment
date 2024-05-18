@@ -67,7 +67,7 @@ def is_logged_in():
 
 @app.route('/')
 def render_home_page():
-    return render_template('home_page.html')
+    return render_template('home_page.html', logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/search', methods=['POST', 'GET'])
@@ -106,14 +106,16 @@ def render_delete_word_page(word):
     # that word to the page, and presents specifically the data for that word alone.
     if request.method == 'POST':
         con = open_database(DATABASE)
-        query = 'DELETE FROM dictionary WHERE maori_name LIKE ?'
-        cur = con.cursor()
+        print('This is before the delete happens.')
         print(word)
-        cur.execute(query, (word,))
-        word_info = cur.fetchall()
+        query = 'DELETE FROM dictionary WHERE maori_name = ?'
+        cur = con.cursor()
+        cur.execute(query, (word, ))
+        con.commit()
         con.close()
-        print(word_info)
-        return render_template('delete_word.html', word=word_info, admin=is_admin(), logged_in=is_logged_in())
+        print(word)
+        print('This is after the delete happens.')
+        return redirect('/dictionary?error=Word+successfully+deleted.')
 
     return render_template('delete_word.html', admin=is_admin(), logged_in=is_logged_in())
 
@@ -131,7 +133,7 @@ def render_word_page(word):
     word_info = cur.fetchall()
     con.close()
     print(word_info)
-    return render_template('word_page.html', word=word_info, is_admin=is_admin(), logged_in=is_logged_in())
+    return render_template('word_page.html', word=word, page_word=word_info, is_admin=is_admin(), logged_in=is_logged_in())
 
 
 @app.route('/user/<user>')
@@ -255,7 +257,7 @@ def render_category_admin():
 @app.route('/category', methods=['POST', 'GET'])
 def render_category_page():
     con = open_database(DATABASE)
-    query_category = 'SELECT DISTINCT category_name FROM categories'
+    query_category = 'SELECT DISTINCT category_id, category_name FROM categories'
     cur = con.cursor()
     cur.execute(query_category)
     category = cur.fetchall()
@@ -263,12 +265,14 @@ def render_category_page():
     con.close()
     if request.method == 'POST':
         print(request.form)
-        category_chosen = request.form.get('category').lower().title().strip()
+        category_chosen = request.form.get('category').capitalize().strip()
+        print(category_chosen)
         con = open_database(DATABASE)
-        query = 'SELECT maori_name, english_name, category_name, definition, level FROM dictionary INNER JOIN categories WHERE categories.category_name = ?'
+        query = 'SELECT maori_name, english_name, category_name, definition, level FROM dictionary INNER JOIN categories ON dictionary.category = categories.category_id WHERE category = ?'
         cur = con.cursor()
         cur.execute(query, (category_chosen,))
         dictionary_content_category = cur.fetchall()
+        con.close()
         return render_template('category_page.html', dictionary_category=dictionary_content_category, category=category, logged_in=is_logged_in(), is_admin=is_admin())
 
     return render_template('category_page.html', category=category, logged_in=is_logged_in(), is_admin=is_admin())

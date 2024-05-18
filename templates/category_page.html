@@ -7,7 +7,7 @@
         <label for="user_type">Choose a category to filter by:</label>
             <select class="form-control" name="category" id="category" required>
                 {% for id in category %}
-                <option value={{ id[0] }}>{{ id[0] }}</option>
+                <option value={{ id[0] }}>{{ id[1] }}</option>
                 {% endfor %}
             </select>
 
@@ -24,7 +24,7 @@
                 <div class="box_heading">
                     <h3><strong>Maori - </strong> {{ word[0] }} </h3>
                     <h3><strong>English - </strong> {{ word[1] }} </h3>
-                    <p><strong>Category - </strong> {{ word[2] }} </p>
+                    <p><strong>Category - </strong> {{ word[2] }}</p>
                     <p><strong>Definition - </strong> {{ word[3] }}</p>
                     <p><strong>Level - </strong> {{ word[4] }}</p>
                     <p><strong>User Added - </strong> {{ word[5] }}</p>

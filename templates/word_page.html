@@ -3,7 +3,7 @@
 {% block pageheading %}Word Info{% endblock %}
 
 {% block main %}
-    {% for id in word %}
+    {% for id in page_word %}
     <div class="box">
         <img src="/static/images/{{ id[2] }}.jpg" alt="{{ id[2] }}">
         <h3>Maori - {{ id[1] }}</h3>
@@ -17,6 +17,6 @@
     {% endfor %}
     <a href="/dictionary"><h3>Return to dictionary?</h3></a>
     {% if is_admin %}
-    <a href="/delete/<word>"><h3>Delete word?</h3></a>
+    <a href="/delete/{{ word }}"><h3>Delete word?</h3></a>
     {% endif %}
 {% endblock %}
