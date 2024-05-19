@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block pageheading %}Maori Dictionary{% endblock %}
+
+{% block main %}
+
+    <div class="box">
+        {% for category in categories %}
+            <table>
+                <thead>
+                    <tr class="box-word">
+                        <th>Category Number</th>
+                        <th>Category Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="box-word">
+                        <td><a href="/category/{{ category[0] }}">{{ category[0] }}</a></td>
+                        <td>{{ category[1] }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+{% endblock %}

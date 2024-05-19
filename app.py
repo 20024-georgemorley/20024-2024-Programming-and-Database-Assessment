@@ -50,6 +50,11 @@ def is_admin():
         return False
 
 
+def image_exists():
+    session.get('page_word')
+
+
+
 def is_logged_in():
     # Similar purpose to the is_admin() function above, but in this case it requests whether the current session's
     # user has an email or not, and as the email is a mandatory field, it means that if email is equal to 'None', it
@@ -77,8 +82,6 @@ def render_search_page():
         search = request.form.get('search')
         print(search)
 
-        # add inner join at some point
-
         # **THIS COMMENT WILL EXPLAIN ALL DATABASE OPENING, REQUESTING AND CLOSING SCRIPTS WITH MINOR CHANGES**
         # This specific select statement selects all the data from the 'dictionary' table where the word's maori
         # name or english name contains the word or letter written in the search field present in the search page.
@@ -101,20 +104,17 @@ def render_search_page():
 
 @app.route('/delete/<word>', methods=['POST', 'GET'])
 def render_delete_word_page(word):
-    # This select statement selects a word from the dictionary that is equal to the word defined above that was
-    # selected by the user via a link in the dictionary page. This select statement then posts the information of
-    # that word to the page, and presents specifically the data for that word alone.
+    # This function serves to delete a word from the dictionary using the SQL DELETE FROM function. It requests the word
+    # from the word_page, and deletes all words from the dictionary where the maori word for it is equal to the maori word
+    # taken from the word_page. The user is then redirected back to the dictionary and is told that the word was successfully
+    # deleted.
     if request.method == 'POST':
         con = open_database(DATABASE)
-        print('This is before the delete happens.')
-        print(word)
         query = 'DELETE FROM dictionary WHERE maori_name = ?'
         cur = con.cursor()
         cur.execute(query, (word, ))
         con.commit()
         con.close()
-        print(word)
-        print('This is after the delete happens.')
         return redirect('/dictionary?error=Word+successfully+deleted.')
 
     return render_template('delete_word.html', admin=is_admin(), logged_in=is_logged_in())
@@ -136,11 +136,42 @@ def render_word_page(word):
     return render_template('word_page.html', word=word, page_word=word_info, is_admin=is_admin(), logged_in=is_logged_in())
 
 
+@app.route('/category/<category>', methods=['POST', 'GET'])
+def render_category_page(category):
+    # This function serves to request data from the database where the category_id of each word is compared against the
+    # data taken from the page (category). This will request all information from the database where the category_id of
+    # the information is equal to the inputted category.
+    con = open_database(DATABASE)
+    query = 'SELECT * FROM categories WHERE category_id LIKE ?'
+    cur = con.cursor()
+    cur.execute(query, (category,))
+    category_info = cur.fetchall()
+    con.close()
+    print(category_info)
+    if request.method == 'POST':
+        # This area of the function allows the user to rename the category that is shown on the page. The function requests
+        # the user's input from a textbox, and assigns it to 'category_rename'. This is used to update the category name
+        # of an entry in the category table where the category ID of the category is equal to 'category', a variable taken
+        # from earlier in the function. It then commits this update and closes the database while redirecting the user back
+        # to the main category catalogue page.
+        print(f'request.form = {request.form}')
+        category_rename = request.form.get('category_rename')
+        print(category_rename)
+        con = open_database(DATABASE)
+        rename_query = 'UPDATE categories SET category_name = ? WHERE category_id = ?'
+        cur = con.cursor()
+        cur.execute(rename_query, (category_rename, category, ))
+        con.commit()
+        con.close()
+        return redirect('/category_catalogue?error=Category+successfully+renamed.')
+
+    return render_template('category_page.html', category=category_info, is_admin=is_admin(), logged_in=is_logged_in())
+
+
 @app.route('/user/<user>')
 def render_user_page(user):
-    # This select statement selects a word from the dictionary that is equal to the word defined above that was
-    # selected by the user via a link in the dictionary page. This select statement then posts the information of
-    # that word to the page, and presents specifically the data for that word alone.
+    # This function works identically to the word_page function above, except instead of searching the dictionary table,
+    # it searches the users table instead. Any explanations about how the SQL works specifically is in the word_page function.
     con = open_database(DATABASE)
     query = 'SELECT user_id, type, first_name, last_name, email FROM users WHERE user_id LIKE ?'
     cur = con.cursor()
@@ -154,7 +185,12 @@ def render_user_page(user):
 @app.route('/dictionary', methods=['POST', 'GET'])
 def render_dictionary_page():
     # This select statement only needs to display the word's name in maori, as that is what is present on the link that
-    # the user will click on to view the rest of the information about the word in the /word page.
+    # the user will click on to view the rest of the information about the word in the /word page. There is also an inner
+    # join present that is used to display the name of the category, as opposed to just its category ID, the field present
+    # in the dictionary table. The inner join compares the values of the category_id in the categories table and category
+    # field in the dictionary table, and joins the tables if there is a parity between any of the values. This can then be
+    # used to request values from the categories table, hence the 'category_name' value not existing in the dictionary
+    # table but only in the categories table.
     con = open_database(DATABASE)
     query = 'SELECT maori_name, english_name, category_name, definition, level FROM dictionary INNER JOIN categories WHERE dictionary.category = categories.category_id'
 
@@ -169,8 +205,8 @@ def render_dictionary_page():
 
 @app.route('/user_catalogue', methods=['POST', 'GET'])
 def render_user_catalogue():
-    # This select statement only needs to display the word's name in maori, as that is what is present on the link that
-    # the user will click on to view the rest of the information about the word in the /word page.
+    # This functions serves to display all the users of the website, and it simply requests the user_id, first_name and
+    # last_name from the database and displays it.
     con = open_database(DATABASE)
     query = 'SELECT user_id, first_name, last_name FROM users'
     cur = con.cursor()
@@ -181,8 +217,26 @@ def render_user_catalogue():
     return render_template('user_catalogue.html', users=user_content, logged_in=is_logged_in(), is_admin=is_admin())
 
 
+@app.route('/category_catalogue', methods=['POST', 'GET'])
+def render_category_catalogue():
+    # This functions the same way as the user_catalogue function, except it selects the category_id and category_name from
+    # the categories table instead of from the users table.
+    con = open_database(DATABASE)
+    query = 'SELECT category_id, category_name FROM categories'
+    cur = con.cursor()
+    cur.execute(query)
+    category_content = cur.fetchall()
+    con.close()
+    print(category_content)
+    return render_template('category_catalogue.html', categories=category_content, logged_in=is_logged_in(), is_admin=is_admin())
+
+
 @app.route('/dictionary_admin', methods=['POST', 'GET'])
 def render_dictionary_admin():
+    # This function serves as the way that the user (teacher user only) can add words to the dictionary, and also contains
+    # a link to the category_admin table where they can add a category.
+    # This first part of the function simply displays the categories for use in the dropdown menu, showing both the name
+    # of the category and its ID to provide more information to the user.
     con = open_database(DATABASE)
     query_category = 'SELECT DISTINCT category_id, category_name FROM categories'
     cur = con.cursor()
@@ -191,6 +245,13 @@ def render_dictionary_admin():
     print(f'category = {category}')
     con.close()
     if request.method == 'POST':
+        # This part of the function is used to request the details from the text boxes present in the dictionary admin page,
+        # and they are used to specify the details of the word that will be added. The inputs from the text boxes are converted
+        # into variables using a request.form.get function and are adjusted in order to make them correspond to the nature
+        # of the words in the database. A series of checks are then made to verify certain details about the inputs, such
+        # as ensuring that the level value is a number between 1 and 10 inclusive. There is also a function that requests
+        # the current time which will be added into the database alongside the inputs.
+        # The function then inserts these values into the dictionary where they correspond to specific values within the dictionary.
         print(f'request.form = {request.form}')
         print(f"request.form.get('type') = {request.form.get('type')}")
         english_name = request.form.get('english_name').title().strip()
@@ -203,20 +264,22 @@ def render_dictionary_admin():
         try:
             level = int(level)
         except ValueError:
+            # Returns if the level value is not an integer.
             return redirect('/dictionary_admin?error=Please+enter+a+numeral+between+1+and+10')
         if level in range(1, 11):
             print(level)
         else:
+            # Error regarding number being between 1 and 10 inclusive
             return redirect("/dictionary_admin?error=Choose+a+level+between+1+and+10")
         con = open_database(DATABASE)
         user_id = session.get('user_id')
         query = 'INSERT INTO dictionary (english_name, maori_name, category, definition, level, user_id, date_entered) VALUES (?, ?, ? ,? ,? ,? ,?)'
         cur = con.cursor()
         cur.execute(query, (english_name, maori_name, category, definition, level, user_id, time_added))
-
+        # The values from the text boxes correspond to fields within the dictionary table.
         con.commit()
         con.close()
-
+        # A redirect happens alongside an 'error' message to show that the addition was successful.
         return redirect("/dictionary_admin?error=Addition+successful")
 
     return render_template('dictionary_admin.html', category=category, logged_in=is_logged_in(), is_admin=is_admin())
@@ -224,6 +287,8 @@ def render_dictionary_admin():
 
 @app.route('/category_admin', methods=['POST', 'GET'])
 def render_category_admin():
+    # Works similarly to the dictionary admin function, except that it requests the categories from the database instead
+    # of the words.
     con = open_database(DATABASE)
     query_category = 'SELECT category_name FROM categories'
     cur = con.cursor()
@@ -232,6 +297,9 @@ def render_category_admin():
     print(f'category = {category}')
     con.close()
     if request.method == 'POST':
+        # This area of the function requests the user's input from the category input text boxes on the html page and adds
+        # the input to the categories table alongside validating whether it is a string and requesting the user_id and what
+        # date and time the category was added.
         print(f'request.form = {request.form}')
         new_category_name = request.form.get('category_name').title().strip()
         try:
@@ -255,7 +323,11 @@ def render_category_admin():
 
 
 @app.route('/category', methods=['POST', 'GET'])
-def render_category_page():
+def render_category_filter_page():
+    # This page gives the user the ability to browse the dictionary but filtered by category. The first part of the function
+    # requests the category id and name from the categories table that will be displayed on the dropdown menu to select the
+    # category filter. The second part selects all the data from the dictionary table where the word's category is equal to the
+    # category specified by the user in the dropdown menu.
     con = open_database(DATABASE)
     query_category = 'SELECT DISTINCT category_id, category_name FROM categories'
     cur = con.cursor()
@@ -273,13 +345,18 @@ def render_category_page():
         cur.execute(query, (category_chosen,))
         dictionary_content_category = cur.fetchall()
         con.close()
-        return render_template('category_page.html', dictionary_category=dictionary_content_category, category=category, logged_in=is_logged_in(), is_admin=is_admin())
+        # Re-renders the page in order to display the new data that has been filtered.
+        return render_template('category_filter_page.html', dictionary_category=dictionary_content_category, category=category, logged_in=is_logged_in(), is_admin=is_admin())
 
-    return render_template('category_page.html', category=category, logged_in=is_logged_in(), is_admin=is_admin())
+    return render_template('category_filter_page.html', category=category, logged_in=is_logged_in(), is_admin=is_admin())
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def render_login_page():
+    # This page allows the user to login. It works by requesting the data that the user added into the text boxes and comparing
+    # it against all the records inside the users table. It has to then decrypt the hashed password as the password that the
+    # user types in and the encrypted password will not be equal. If program decrypts the password before it is equal to the user's
+    # input, then it switches the logged_in function to true and returns to the home page.
     if is_logged_in():
         return redirect("/dictionary")
     print("Logging In...")
@@ -323,6 +400,8 @@ def render_login_page():
 
 @app.route('/logout')
 def logout():
+    # The session.pop command returns the session to a state prior to the user logging in. It then returns the user to
+    # the home page and provides a successful logout message.
     print(list(session.keys()))
     [session.pop(key) for key in list(session.keys())]
     print(list(session.keys()))
@@ -331,8 +410,11 @@ def logout():
 
 @app.route('/signup', methods=['POST', 'GET'])
 def render_signup_page():
-    if is_logged_in():
-        return redirect("/dictionary")
+    # This page allows the user to add a new user to the website. It requests the user's inputs from the signup page, and
+    # stores them as variables. It then ensures that the user's first and second password entries are equal, and that the
+    # length of their password is greater than 8 characters. It then generates an encrypted password using the password that
+    # the user entered, and then inserts all the values (replacing password and password_two with an encrypted password) into
+    # the users table. It then returns them to the home page where they can proceed to log in with their new login.
     if request.method == 'POST':
         print(request.form)
         print(request.form.get('type'))

@@ -3,14 +3,18 @@
 {% block pageheading %}Maori Dictionary{% endblock %}
 
 {% block main %}
-    <div class="category-menu">
-        <ul>
-            {% for category in categories %}
-            <li> <a href="/dictionary/{{ category[0] }}">{{ category[1] }}</a> </li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class>
+    <div class="box">
+        <h3>Welcome to the George Morley's Maori Dictionary!</h3>
+        <p>
+            This dictionary hopes to serve as a way for a school to provide a way for their students to learn Te Reo Maori,
+            and for their teachers to be able to modify the dictionary as they see fit in order to allow for more content to
+            be added in the future. It has also been made sure that only certain types of users are able to make permanent
+            changes to the website in order to facilitate an easier moderation experience for teachers.
 
+            We have made efforts to be as culturally sensitive, accessible and easy to use as reasonably possible in order
+            to provide the best learning experience for the users of this website.
+
+            Happy learning!
+        </p>
     </div>
 {% endblock %}

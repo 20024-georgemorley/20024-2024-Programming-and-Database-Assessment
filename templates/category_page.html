@@ -1,37 +1,27 @@
 {% extends 'base.html' %}
 
-{% block pageheading %}Maori Dictionary - Filter by Category{% endblock %}
+{% block pageheading %}Category Info{% endblock %}
 
 {% block main %}
-    <form class="myform" method="post">
-        <label for="user_type">Choose a category to filter by:</label>
-            <select class="form-control" name="category" id="category" required>
-                {% for id in category %}
-                <option value={{ id[0] }}>{{ id[1] }}</option>
-                {% endfor %}
-            </select>
-
+    {% for id in category %}
+    <div class="box">
+        <h3>Category Number - {{ id[0] }}</h3>
+        <h3>Category Name - {{ id[1] }}</h3>
+        <h3>User Added - {{ id[2] }}</h3>
+        <h3>Date Added - {{ id[3] }}</h3>
+    </div>
+    {% endfor %}
+    <div class="box">
+        <form class="myform" method="post">
+            <div class="form-group">
+                <div class="form-label">Rename Category:</div>
+                <div class="form-element"><input type="text" name="category_rename" id="category_rename"required></div>
+            </div>
             <div class="form-group">
                 <div class="form-label"></div>
-                <div class="form-element"><input type="submit" value="Submit Filter"></div>
+                <div class="form-element"><input type="submit" value="Submit"></div>
             </div>
-    </form>
-
-    <div class="content">
-        {% for word in dictionary_category %}
-        <div class="box">
-            <table class="box">
-                <div class="box_heading">
-                    <h3><strong>Maori - </strong> {{ word[0] }} </h3>
-                    <h3><strong>English - </strong> {{ word[1] }} </h3>
-                    <p><strong>Category - </strong> {{ word[2] }}</p>
-                    <p><strong>Definition - </strong> {{ word[3] }}</p>
-                    <p><strong>Level - </strong> {{ word[4] }}</p>
-                    <p><strong>User Added - </strong> {{ word[5] }}</p>
-                    <p>Go to word: <a href="/word/{{ word[0] }}">{{ word[0] }}</a></p>
-                </div>
-            </table>
-        </div>
-        {% endfor %}
+        </form>
     </div>
+    <a href="/category_catalogue"><h3>Return to category catalogue?</h3></a>
 {% endblock %}

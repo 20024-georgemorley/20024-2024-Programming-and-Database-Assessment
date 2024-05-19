@@ -3,6 +3,20 @@
     background: lightgrey
 }
 
+.placeholder_img {
+    overflow: hidden;
+    width: 178px;
+    height: 118px;
+    background-image: url("/static/images/noimage.jpg")
+}
+
+.img {
+    overflow: hidden;
+    width: 178px;
+    height: 118px;
+    object-fit: contain;
+}
+
 title-bar {
     background: darkgrey;
     color: black;
@@ -22,15 +36,19 @@ title-bar {
     word-wrap: normal;
 }
 
-box_image {
-    height: 150px;
-    overflow: hidden;
+.definition {
+    width: 100%;
 }
 
-tr, td, th {
+.tr, td, th {
     justify-content: normal;
     margin: auto;
-    width: 100%;
+    width: 15%;
     border: 1px solid black;
     padding: 0.5rem;
+}
+
+.thead, th {
+    position: sticky;
+    top: 0px;
 }
