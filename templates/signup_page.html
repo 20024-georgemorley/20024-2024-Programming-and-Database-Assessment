@@ -1,3 +1,10 @@
+<!--This page allows the user to add a new account to the users table in the database that they can then use to login in
+with. It receives input from the user through 1 dropdown menu for selecting a user type, and then 5 text fields where
+they enter their first name, last name, email, password, and then their password again for validation. The email address
+uses the 'email' type and therefore requires the prerequisite parts of an email address. This data is sent via the
+submit button to the corresponding render_template where it is then entered into the database after passing through
+validation. The user is then sent to the homepage where they can then choose to log in using the login page.-->
+
 {% extends 'base.html' %}
 
 

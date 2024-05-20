@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
-
+<!--The below code is responsible for applying the stylesheet 'styles.css' to each of the pages. The viewport function
+is responsible for ensuring that the website can be viewed on devices with a diverse number of aspect ratios.-->
 <head>
     <meta charset="utf-8">
     <title>The Maori Dictionary</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-
+<!--This area of the html is responsible for displaying the navigation menu, which doesn't change across the website
+but only changes depending upon the admin level of the user and whether they are logged in or not. There are two
+separate functions that are passed over from the main .py scripts, the 'logged_in' function and the 'is_admin' function
+-->
 <body>
 <nav class="title-bar">
     <div>
@@ -31,6 +35,8 @@
         </div>
     </div>
 </nav>
+<!--The blocks below will be changed by each specific page, and therefore use Jinja2 definitions that will be filled by
+the code in each unique page-->
 <div>
     <header>
         <h1></h1>

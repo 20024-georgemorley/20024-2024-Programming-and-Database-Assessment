@@ -1,3 +1,11 @@
+<!--This page is responsible for allowing a teacher user to add more words to the dictionary, and contains a link to
+the category admin page, where the user can add categories. This page takes inputs from the user through 5 fields, the
+english name, maori name, category (dropdown), word definition and level. This is contained within a form that posts
+the data to the database via the render_template, and also requests the category names and corresponding IDs from the
+category table. The user is expected to type in words that are below 30 characters for all the fields except for the
+definition field, where they can type up to 300 characters. It can be reasonably assumed that no user will need to type
+over 30 characters for any word.-->
+
 {% extends 'base.html' %}
 
 {% block pageheading %}Dictionary Admin Console{% endblock %}
