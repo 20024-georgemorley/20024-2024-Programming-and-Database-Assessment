@@ -19,7 +19,7 @@ app.secret_key = "9571"
 # for home computer - C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database
 # for school computer - C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database
 
-DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database'
+DATABASE = 'C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database'
 
 
 # make sure to add upvote system
@@ -52,7 +52,6 @@ def is_admin():
 
 def image_exists():
     session.get('page_word')
-
 
 
 def is_logged_in():
