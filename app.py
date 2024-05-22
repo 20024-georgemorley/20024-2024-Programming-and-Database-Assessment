@@ -16,17 +16,20 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "9571"
 
-# for home computer - C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database
-# for school computer - C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project Files/Project/database
+# for home computer - C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database for
+# school computer - C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main
+# Project Files/Project/database
 
-DATABASE = 'C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database'
+DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project ' \
+           'Files/Project/database'
 
 
 # make sure to add upvote system
 
 
 def open_database(db_file):
-    # This function is responsible for connecting to the external database that is found in the constant 'DATABASE' shown above.
+    # This function is responsible for connecting to the external database that is found in the constant 'DATABASE'
+    # shown above.
     try:
         connection = sqlite3.connect(db_file)
         return connection
@@ -48,10 +51,6 @@ def is_admin():
     else:
         print('Student user.')
         return False
-
-
-def image_exists():
-    session.get('page_word')
 
 
 def is_logged_in():
@@ -103,10 +102,10 @@ def render_search_page():
 
 @app.route('/delete/<word>', methods=['POST', 'GET'])
 def render_delete_word_page(word):
-    # This function serves to delete a word from the dictionary using the SQL DELETE FROM function. It requests the word
-    # from the word_page, and deletes all words from the dictionary where the maori word for it is equal to the maori word
-    # taken from the word_page. The user is then redirected back to the dictionary and is told that the word was successfully
-    # deleted.
+    # This function serves to delete a word from the dictionary using the SQL DELETE FROM function. It requests the
+    # word from the word_page, and deletes all words from the dictionary where the maori word for it is equal to the
+    # maori word taken from the word_page. The user is then redirected back to the dictionary and is told that the
+    # word was successfully deleted.
     if request.method == 'POST':
         con = open_database(DATABASE)
         query = 'DELETE FROM dictionary WHERE maori_name = ?'
@@ -125,7 +124,8 @@ def render_word_page(word):
     # selected by the user via a link in the dictionary page. This select statement then posts the information of
     # that word to the page, and presents specifically the data for that word alone.
     con = open_database(DATABASE)
-    query = 'SELECT * FROM dictionary WHERE maori_name LIKE ?'
+    query = 'SELECT maori_name, english_name, category_name, definition, level, dictionary.user_id, dictionary.date_entered FROM ' \
+            'dictionary INNER JOIN categories ON dictionary.category = categories.category_id WHERE maori_name LIKE ?'
     cur = con.cursor()
     print(word)
     cur.execute(query, (word,))
@@ -192,7 +192,8 @@ def render_dictionary_page():
     # any of the values. This can then be used to request values from the categories table, hence the 'category_name'
     # value not existing in the dictionary table but only in the categories table.
     con = open_database(DATABASE)
-    query = 'SELECT maori_name, english_name, category_name, definition, level FROM dictionary INNER JOIN categories WHERE dictionary.category = categories.category_id'
+    query = 'SELECT maori_name, english_name, category_name, definition, level FROM dictionary INNER JOIN categories ' \
+            'WHERE dictionary.category = categories.category_id'
     cur = con.cursor()
     cur.execute(query)
     dictionary_content = cur.fetchall()
@@ -273,7 +274,8 @@ def render_dictionary_admin():
             return redirect("/dictionary_admin?error=Choose+a+level+between+1+and+10")
         con = open_database(DATABASE)
         user_id = session.get('user_id')
-        query = 'INSERT INTO dictionary (english_name, maori_name, category, definition, level, user_id, date_entered) VALUES (?, ?, ? ,? ,? ,? ,?)'
+        query = 'INSERT INTO dictionary (english_name, maori_name, category, definition, level, user_id, ' \
+                'date_entered) VALUES (?, ?, ? ,? ,? ,? ,?)'
         cur = con.cursor()
         cur.execute(query, (english_name, maori_name, category, definition, level, user_id, time_added))
         # The values from the text boxes correspond to fields within the dictionary table.
@@ -340,7 +342,8 @@ def render_category_filter_page():
         category_chosen = request.form.get('category').capitalize().strip()
         print(category_chosen)
         con = open_database(DATABASE)
-        query = 'SELECT maori_name, english_name, category_name, definition, level FROM dictionary INNER JOIN categories ON dictionary.category = categories.category_id WHERE category = ?'
+        query = 'SELECT maori_name, english_name, category_name, definition, level FROM dictionary INNER JOIN ' \
+                'categories ON dictionary.category = categories.category_id WHERE category = ?'
         cur = con.cursor()
         cur.execute(query, (category_chosen,))
         dictionary_content_category = cur.fetchall()
