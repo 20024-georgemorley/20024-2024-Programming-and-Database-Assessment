@@ -7,6 +7,8 @@ with the data sent by the user in a similar fashion to the query done by word-pa
 {% block pageheading %}User Info{% endblock %}
 
 {% block main %}
+    <h3>User Type 1 - Teacher</h3>
+    <h3>User Type 0 - Student</h3>
     {% for id in user %}
     <div class="box">
         <h3>User Name - {{ id[2] }} {{ id[3] }}</h3>

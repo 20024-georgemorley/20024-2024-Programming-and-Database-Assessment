@@ -20,8 +20,7 @@ app.secret_key = "9571"
 # school computer - C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main
 # Project Files/Project/database
 
-DATABASE = 'C:/Users/20024/OneDrive - Wellington College/2024 20024 Programming and Database Assessment/Main Project ' \
-           'Files/Project/database'
+DATABASE = 'C:/Users/georg/PycharmProjects/20024-2024-Programming-and-Database-Assessment/database'
 
 
 # make sure to add upvote system
@@ -124,7 +123,7 @@ def render_word_page(word):
     # selected by the user via a link in the dictionary page. This select statement then posts the information of
     # that word to the page, and presents specifically the data for that word alone.
     con = open_database(DATABASE)
-    query = 'SELECT maori_name, english_name, category_name, definition, level, dictionary.user_id, dictionary.date_entered FROM ' \
+    query = 'SELECT word_id, maori_name, english_name, category_name, definition, level, dictionary.user_id, dictionary.date_entered FROM ' \
             'dictionary INNER JOIN categories ON dictionary.category = categories.category_id WHERE maori_name LIKE ?'
     cur = con.cursor()
     print(word)
